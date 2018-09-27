@@ -9,24 +9,29 @@
 
 //     $("#click").on("click", function () {
 
-//         console.log("hey");
+//         for(i = 0; i < response.length; i++) {
+//             var a = $("<p>");
+//             a.html(response[i].beat + "<br>" + 
+//                     response[i].block + "<br" +
+//                     response[i].data_time + "<br" +
+//                     response[i].division + "<br>" +
+//                     response[i].incident_number + "<br>" +
+//                     response[i].location+ "<br>" +
+//                     response[i].nature_of_call + "<br>" +
+//                     response[i].priority + "<br>" +
+//                     response[i].reporting_area+ "<br>" +
+//                     response[i].status + "<br>" +
+//                     response[i].unit_number + "<br>");
 
 
-//         $("#1").text(response[0].beat);
-//         $("#2").text(response[0].block);
-//         $("#3").text(response[0].date_time);
-//         $("#4").text(response[0].division);
-//         $("#5").text(response[0].incident_number);
-//         $("#6").text(response[0].location);
-//         $("#7").text(response[0].nature_of_call);
-//         $("#8").text(response[0].priority);
-//         $("#9").text(response[0].reporting_area);
-//         $("#10").text(response[0].status);
-//         $("#11").text(response[0].unit_number);
+//                     console.log(response[i].geolocation === undefined);
 
+//             $("#show").append(a);
+            
 
+//         }
 
-
+//         $("#click").hide();
 
 //     })
 
@@ -51,18 +56,18 @@ $.ajax({
             }
 
             var a = $("<p>");
-            a.html(response[i].ag_forms + "<br>" + 
-                    response[i].case + "<br" +
-                    response[i].date + "<br" +
-                    response[i].geolocation_address + "<br>" +
-                    response[i].geolocation_city + "<br>" +
-                    response[i].geolocation_state + "<br>" +
-                    response[i].grand_jury_disposition + "<br>" +
-                    response[i].location + "<br>" +
-                    response[i].officer_s + "<br>" +
-                    response[i].summary_url + "<br>" +
-                    response[i].suspect_deceased_injured_or_shoot_and_miss + "<br>" +
-                    response[i].suspect_s + "<br>" +
+            a.html(response[i].ag_forms + "<br>" + "<hr>" + 
+                    response[i].case + "<br>" + "<hr>"+
+                    response[i].date + "<br>"+ "<hr>" +
+                    response[i].geolocation_address + "<br>" + "<hr>" +
+                    response[i].geolocation_city + "<br>" + "<hr>"+
+                    response[i].geolocation_state + "<br>" + "<hr>"+
+                    response[i].grand_jury_disposition + "<br>" + "<hr>"+
+                    response[i].location + "<br>" + "<hr>"+
+                    response[i].officer_s + "<br>" + "<hr>"+
+                    response[i].summary_url + "<br>" + "<hr>"+
+                    response[i].suspect_deceased_injured_or_shoot_and_miss + "<br>" + "<hr>"+
+                    response[i].suspect_s + "<br>" + "<hr>"+
                     response[i].suspect_weapon + "<br>" );
 
                     console.log(response[i].geolocation === undefined);
@@ -73,12 +78,7 @@ $.ajax({
 
         }
 
-        console.log("hey");
-
-
-
-
-
+        $("#click").hide();
 
 
 
