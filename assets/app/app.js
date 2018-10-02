@@ -31,7 +31,10 @@ function getShootingRecords(srcLat, srcLng) {
 
         if (areCoordsWithinRegion(srcLat, srcLng, coords, 0.10) ){
             console.log("found one " + coords.lat + "/" + coords.lng);
-            records.push(coords);
+            records.push ({
+                coords: coords,
+                incident: shootingResponse[i]
+            });
         }
     }
 
@@ -68,7 +71,10 @@ function getCurrentCalls(srcLat, srcLng) {
 
         if (areCoordsWithinRegion(srcLat, srcLng, coords, 0.10)) {
             console.log("found one " + coords.lat + "/" + coords.lng);
-            records.push(coords);
+            records.push({
+                coords: coords,
+                incident: currentCalls[i]
+            });
         }
     }
 
@@ -86,15 +92,18 @@ function areCoordsWithinRegion(srcLat, srcLng, targetCoords, range) {
 }
 
 
-function addMark(lat, lng) {
+function addMark(lat, lng, title, txt) {
 
+    console.log(lat);
+    console.log(lng);
+    console.log(title);
+    console.log(txt);
     $(function () {
 
         $("#map").addMarker({
             coords: [lat, lng], // GPS coords
-            title: 'Shooting Incident', // Title
-            text: ""// HTML content
-
+            title: title, // Title
+            text: txt// HTML content
         });
     })
 }
@@ -117,9 +126,16 @@ $("#shootings").on("click", function () {
     var recs = getShootingRecords(coords.lat, coords.lng);
 
     centerMap(coords.lat, coords.lng);
+    addMark(coords.lat, coords.lng, "Search Location", "");
 
     for (i = 0; i < recs.length; i++) {
-        addMark(recs[i].lat, recs[i].lng);
+
+        var html = "<p>Date: " + recs[i].incident.date + 
+                    "</p><p>Suspect: " + recs[i].incident.suspect_s +
+                    "</p><p>Weapon: " + recs[i].incident.suspect_weapon +
+                    "</p><p>Result: " + recs[i].incident.suspect_deceased_injured_or_shoot_and_miss + "</p>";
+
+        addMark(recs[i].coords.lat, recs[i].coords.lng, recs[i].incident.case, html);
     }
 });
 
@@ -131,9 +147,15 @@ $("#current").on("click", function () {
     var recs = getCurrentCalls(coords.lat, coords.lng);
 
     centerMap(coords.lat, coords.lng);
+    addMark(coords.lat, coords.lng, "Search Location", "");
 
     for (i = 0; i < recs.length; i++) {
-        addMark(recs[i].lat, recs[i].lng);
+        var html = "<p>Date: " + recs[i].incident.date_time +
+            "</p><p>Priority: " + recs[i].incident.priority +
+            "</p><p>Unit: " + recs[i].incident.unit_number +
+            "</p><p>Status: " + recs[i].incident.status + "</p>";
+
+        addMark(recs[i].coords.lat, recs[i].coords.lng, recs[i].incident.nature_of_call, html);
     }
 });
 
