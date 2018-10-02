@@ -17,7 +17,7 @@ function getShootingRecords(srcLat, srcLng) {
         console.log(shootingResponse[i]);
         var coords = null;
         if (!shootingResponse[i].geolocation) {
-            coords = getCoordinates(shootingResponse[i].location + " Dallas TX");
+            coords = getCoordinates(shootingResponse[i].location + " Dallas, TX");
             console.log("found Coords: " + coords.lat + "/" + coords.lng);
         }
         else {
