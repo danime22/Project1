@@ -92,12 +92,19 @@ function areCoordsWithinRegion(srcLat, srcLng, targetCoords, range) {
 }
 
 
-function addMark(lat, lng, title, txt) {
+function addLocationMark(lat, lng) {
+    
 
-    console.log(lat);
-    console.log(lng);
-    console.log(title);
-    console.log(txt);
+    $(function () {
+
+        $("#map").addMarker({
+            coords: [lat, lng], // GPS coords
+            title: "Search Location"
+        });
+    })
+}
+
+function addMark(lat, lng, title, txt) {
     $(function () {
 
         $("#map").addMarker({
@@ -126,7 +133,7 @@ $("#shootings").on("click", function () {
     var recs = getShootingRecords(coords.lat, coords.lng);
 
     centerMap(coords.lat, coords.lng);
-    addMark(coords.lat, coords.lng, "Search Location", "");
+    addLocationMark(coords.lat, coords.lng);
 
     for (i = 0; i < recs.length; i++) {
 
@@ -147,7 +154,7 @@ $("#current").on("click", function () {
     var recs = getCurrentCalls(coords.lat, coords.lng);
 
     centerMap(coords.lat, coords.lng);
-    addMark(coords.lat, coords.lng, "Search Location", "");
+    addLocationMark(coords.lat, coords.lng);
 
     for (i = 0; i < recs.length; i++) {
         var html = "<p>Date: " + recs[i].incident.date_time +
