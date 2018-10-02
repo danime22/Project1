@@ -1,5 +1,4 @@
 var shootingResponse = null;
-
 function getShootingRecords(srcLat, srcLng) {
     console.log("lat/long = " + srcLat + "/" + srcLng); 
     records = [];
@@ -15,7 +14,7 @@ function getShootingRecords(srcLat, srcLng) {
     });
 
     for (i = 0; i < shootingResponse.length; i++) {
-        console.log(shootingResponse[i]);// cob
+        console.log(shootingResponse[i]);
         var coords = null;
         if (!shootingResponse[i].geolocation) {
             coords = getCoordinates(shootingResponse[i].location + " Dallas TX");
@@ -92,12 +91,13 @@ function getShootingRecords(srcLat, srcLng) {
 // });
 
 function addMark(lat, lng) {
+
     $(function () {
 
         $("#map").addMarker({
             coords: [lat, lng], // GPS coords
-            title: 'Your Location', // Title
-            text: 'hey there' // HTML content
+            title: 'Shooting Incident', // Title
+            text: shootingResponse// HTML content
 
         });
     })
@@ -115,6 +115,7 @@ function centerMap(lat, lng) {
 
 $("#click").on("click", function () {
     var search = $("#map-input").val().trim();
+    console.log("Searching: " + search);
     var coords = getCoordinates(search);
 
     var recs = getShootingRecords(coords.lat, coords.lng);
@@ -198,8 +199,8 @@ function getCoordinates(address) {
 var map;
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: -34.397, lng: 150.644 },
-        zoom: 8
+        center: { lat: 32.7766642, lng: -96.79698789999999 },
+        zoom: 10
     });
 }
 
