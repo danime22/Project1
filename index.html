@@ -15,31 +15,45 @@
 
 <body>
 
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <h5 class="card-header">Scratch Project</h5>
-                    <div class="card-body">
-                        <div id="show">
+    <div class="card">
+        <div class="card-body">
+            <div class="container">
+                <div class="row">
+                    <div class="col">
 
-                        </div>
                         <input id="map-input" type="text" placeholder="Search Location">
+                        <button type="button" id="search" class="btn btn-primary">Search</button>
                         <br>
                         <br>
-                        <button type="button" id="shootings" class="btn btn-primary">Police Shootings</button>
+                        <ul class="navbar-nav">
+                            <li>
+                                <button type="button" id="shootings" class="btn btn-primary">Police Shootings</button>
+                            </li>
+                            <li>
+                                <button type="button" id="current" class="btn btn-primary">Current Calls</button>
+                            </li>
+                            <li>
+                                <button type="button" id="crime" class="btn btn-primary">Current Crime History</button>
+                            </li>
+                        
+                        </ul>
+                        <!-- <button type="button" id="shootings" class="btn btn-primary">Police Shootings</button> -->
 
-                        <button type="button" id="current" class="btn btn-primary">Current Calls</button>
+                        <!-- <button type="button" id="current" class="btn btn-primary">Current Calls</button> -->
 
+                        <!-- <button type="button" id="crime" class="btn btn-primary">Current Crime History</button> -->
                     </div>
-                </div>
-            </div>
 
+                </div>
+
+            </div>
         </div>
     </div>
 
     <div id="map"></div>
 
+
+    <!-- <script src="https://www.gstatic.com/firebasejs/5.5.2/firebase.js"></script> -->
     <script type="text/javascript" src="assets/app/jquery.googlemap.js"></script>
     <script src="assets/app/app.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDlLaXHzolEt6dE-_eZi6llI_m5uRKQu-c&callback=initMap" async

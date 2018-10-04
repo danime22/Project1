@@ -1,11 +1,13 @@
 #map-input {
   border: 2px solid black;
   border-radius: 7px;
+  width: 251px;
 }
         #map {
             height: 50%;
-            width: 85%;
-            margin: auto;
+            width: 63%;
+            margin-left: 35%;
+            /* margin-top: -500%; */
         }
 
         /* Optional: Makes the sample page fill the window. */
@@ -83,3 +85,25 @@
         font-weight: 500;
         padding: 6px 12px;
       }
+
+      .container {
+        float: left;
+        border: 2px solid black;
+        width: 400px;
+        height: 100%;
+      }
+
+
+      p {
+        font-size: small;
+
+      }
+
+    #shootings, #current, #crime { 
+      margin: 2px;
+    }
+
+.card {
+  width: 443px;
+}
+     
