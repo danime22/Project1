@@ -1,6 +1,5 @@
-
-
 //#region firebase
+
 var config = {
     apiKey: "AIzaSyBmy65eFPJ8elKkPkySIuBAk-z62R11NVA",
     authDomain: "project-myc.firebaseapp.com",
@@ -15,6 +14,13 @@ var database = firebase.database();
 // register a user
 //returns true if user registered, false if not.
 function registerUser(username, password, email, street, city, state, zip, range) {
+
+    // Make sure this username is not in use.
+    var snapshot = getRecord(username);
+    if (snapshot.exists()) {
+        return false;
+    }
+
     var userPofile = {
         streetName: street,
         cityName: city,
@@ -25,23 +31,29 @@ function registerUser(username, password, email, street, city, state, zip, range
         email: email,
         range: range
     };
-
     database.ref().push(userPofile);
+
+    return true;
 
 }
 
 //return true if logged in, false if not
 function login(username, password) {
-    database.ref().orderByChild("username").equalTo(username).once("value", function(snapshot){
-        console.log(JSON.stringify(snapshot.val()));
-        // console.log("pw=" + snapshot.child(snapsho);
-        // console.log(snapshot.val());
-        snapshot.forEach(function(data) {
-        console.log(data.key);
-        var theKey = data.key;
-        console.log("pw = "+ snapshot.child(data.key).child("password").val());
-    });
-    });
+
+    //todo: check that the username is in the database, if not return false, if it is, compare the password and return true or false.
+    this.valid = false;
+    this.pw = password;
+
+    var snapshot = getRecord(username);
+
+    if (snapshot.exists()) {
+        snapshot.forEach(function (data) {
+            parent.valid = (snapshot.child(data.key).child("password").val() === parent.pw);
+        });
+    }
+
+    return this.valid;
+
 }
 
 // get's the stored users search location
@@ -52,13 +64,41 @@ function login(username, password) {
 //     state
 //     zip
 //     range
-// }
 function getUserSearchLocation(username) {
+    var location = {
+        street: "",
+        city: "",
+        state: "",
+        zip: "",
+        range: ""
+    }
 
+    var snapshot = getRecord(username);
+
+    if (snapshot.exists()) {
+        snapshot.forEach(function (data) {
+
+            location.street = snapshot.child(data.key).child("streetName").val();
+            location.city = snapshot.child(data.key).child("cityName").val();
+        });
+    }
+
+    console.log(JSON.stringify(location));
+    return location;
 }
 
-//#endregion
 
+// returns the snapshot for the user
+function getRecord(username) {
+    this.snap = null;
+    database.ref().orderByChild("username").equalTo(username).once("value", function (snapshot) {
+        //console.log(JSON.stringify(snapshot.val()));
+        parent.snap = snapshot;
+    });
+
+    return this.snap;
+}
+//#endregion
 
 var limit = 50;
 var searchCoords = null; //global for the coordinates of the searched address
@@ -109,7 +149,7 @@ function getShootingRecords(srcLat, srcLng) {
                 incident: shootingResponse[i]
             });
         }
-        
+
     }
 
     return records;
@@ -151,7 +191,7 @@ function getCurrentCalls(srcLat, srcLng) {
                 incident: currentCalls[i]
             });
         }
-       
+
     }
 
     return records;
@@ -198,7 +238,7 @@ function getCrimeHistory(srcLat, srcLng) {
                 incident: crimeIncident[i]
             });
         }
-  
+
     }
 
     return history;
@@ -226,7 +266,7 @@ $("#shootingButton").on("click", function (e) {
         var createP = $("<p>");
         createP.addClass("shooting");
         createP.attr("data-id", i);
-        createP.html(incidentWeapon + "<br />" + suspectCondition  + "<br />" + incidentSuspect + "<br />" + incidentDateTime);
+        createP.html(incidentWeapon + "<br />" + suspectCondition + "<br />" + incidentSuspect + "<br />" + incidentDateTime);
 
         container.append(createP);
 
@@ -273,7 +313,7 @@ $("#callsButton").on("click", function (e) {
         var createP = $("<p>");
         createP.addClass("calls");
         createP.attr("data-id", i);
-        createP.html(incidentNumber + "<br />" + incidentStatus + "<br />" + incidentPriority  + "<br />" + incidentDate );
+        createP.html(incidentNumber + "<br />" + incidentStatus + "<br />" + incidentPriority + "<br />" + incidentDate);
 
         container.append(createP);
 
@@ -305,7 +345,7 @@ $("#crimeButton").on("click", function (e) {
     addLocationMark(searchCoords.lat, searchCoords.lng);
 
     $("#crimeTabs").empty();
-    
+
     for (i = 0; i < historyArray.length; i++) {
 
         var crimeAddress = historyArray[i].incident.geocoded_column_address + " " + historyArray[i].incident.geocoded_column_city + " " + historyArray[i].incident.geocoded_column_state + " " + historyArray[i].incident.geocoded_column_zip;
@@ -336,7 +376,7 @@ $(document).on("click", ".history", historyClick);
 function historyClick() {
     var item = parseInt($(this).attr("data-id"));
     console.log("item: " + item);
-    var coords = historyArray[item].coords;  
+    var coords = historyArray[item].coords;
     centerMap(coords.lat, coords.lng);
     // var map = new google.maps.Map(document.getElementById("map"));
     // var coords = historyArray[item].coords;
