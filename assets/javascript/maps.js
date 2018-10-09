@@ -1,5 +1,6 @@
-//#region firebase
 
+
+//#region firebase
 var config = {
     apiKey: "AIzaSyBmy65eFPJ8elKkPkySIuBAk-z62R11NVA",
     authDomain: "project-myc.firebaseapp.com",
@@ -80,6 +81,10 @@ function getUserSearchLocation(username) {
 
             location.street = snapshot.child(data.key).child("streetName").val();
             location.city = snapshot.child(data.key).child("cityName").val();
+            location.state = snapshot.child(data.key).child("state").val();
+            location.zip = snapshot.child(data.key).child("zip").val();
+            location.range = snapshot.child(data.key).child("range").val();
+     
         });
     }
 
@@ -98,7 +103,10 @@ function getRecord(username) {
 
     return this.snap;
 }
+
 //#endregion
+
+//#region getshooting 
 
 var limit = 50;
 var searchCoords = null; //global for the coordinates of the searched address
@@ -155,6 +163,9 @@ function getShootingRecords(srcLat, srcLng) {
     return records;
 
 }
+//#endregion
+
+//#region activeCalls
 
 var currentCalls = null;
 function getCurrentCalls(srcLat, srcLng) {
@@ -197,6 +208,9 @@ function getCurrentCalls(srcLat, srcLng) {
     return records;
 }
 
+//#endregion
+
+//#region History
 var crimeIncident = null;
 function getCrimeHistory(srcLat, srcLng) {
 
@@ -243,7 +257,9 @@ function getCrimeHistory(srcLat, srcLng) {
 
     return history;
 }
+//#endregion
 
+//#region shootingButton
 var shootingArray = null;
 $("#shootingButton").on("click", function (e) {
     e.preventDefault();
@@ -290,6 +306,9 @@ function shootingClick() {
     }
 }
 
+//#endregion
+
+//#region activeButton
 var currentArray = null;
 $("#callsButton").on("click", function (e) {
     e.preventDefault();
@@ -334,6 +353,10 @@ function currentClick() {
     }
 }
 
+//#endregion
+
+
+//#region crimeHistoryButton
 var historyArray = null;
 $("#crimeButton").on("click", function (e) {
     e.preventDefault();
@@ -389,8 +412,104 @@ function historyClick() {
     }
 }
 
+//#endregion
+
+//#region searchFunction
+function search(address){
+    searchCoords = getCoordinates(address);
+
+    //TODO: check for coords of 0/0 if so, the address was invalid
+    // ALSO, the can only search Dallas area.
+
+    centerMap(searchCoords.lat, searchCoords.lng);
+    addLocationMark(searchCoords.lat, searchCoords.lng);
+}
+
+//#endregion
+
+//#region loginForm
+$("#logIn-input").on("click", function(event){
+    event.preventDefault();
+    alert("work");
+    var username =$("#userLog-input").val().trim();
+    var password = $("#passLog-input").val().trim();
+
+    var success = login(username, password);
+
+    if(success){
+        var location = getUserSearchLocation(username);
+        var add = location.street +" " + location.city + ", " + location.state +" " +location.zip ;
+        search(add);
+        $("#wholeMap").show();
+        $("#formLogin").hide();
+        // hide otherdiv
+    } else {
+        alert("Invalid");
+    }
 
 
+});
+
+//#endregion
+
+
+//#region register form
+$("#register-input").on("click", function(event){
+    event.preventDefault();
+    alert("work");
+    // var username =$("#username-input").val().trim();
+    // var password = $("#password-input").val().trim();
+    var street = $("#street-input").val().trim();
+    var city = $("#city-input").val().trim();
+    var state = $("#state-input").val().trim();
+    var zip = $("#zip-input").val().trim();
+    var username = $("#username-input").val().trim();
+    var password = $("#password-input").val().trim();
+    var password2 = $("#password-input2").val().trim();
+    var email = $("#email-input").val().trim();
+    var range = $("#range-input").val().trim();
+
+    if(password !== password2) {
+        alert("Passwords don't match");
+        return false;
+    }
+
+
+    var success = registerUser(username, password, email, street, city, state, zip, range);
+
+    if(success){
+        // var location = getUserSearchLocation(username);
+        var add = street + " " + city + ", " + state + " " + zip;
+        search(add);
+        $("#wholeMap").show();
+        $("#formRegister").hide();
+    } else {
+        alert("Invalid");
+    }
+
+
+});
+
+//#endregion
+
+
+//#region loginButton
+$("#loginbutton").on("click", function(event){
+    event.preventDefault();
+    $("#formLogin").show();
+    $("#front").hide();
+});
+
+$("#registerbutton").on("click", function(event){
+    event.preventDefault();
+    $("#formRegister").show();
+    $("#front").hide();
+});
+
+
+//#endregion
+
+//#region subtmiButton
 $("#formSubmit").on("click", function (event) {
     event.preventDefault();
     var street = $("#streetName-input").val().trim();
@@ -398,22 +517,10 @@ $("#formSubmit").on("click", function (event) {
     var state = $("#state-input").val().trim();
     var zipCode = $("#zipCode-input").val().trim();
     console.log("text: " + street, city, state, zipCode);
-    searchCoords = getCoordinates(street + " " + city + ", " + state + " " + zipCode);
 
-    //TODO: check for coords of 0/0 if so, the address was invalid
-    // ALSO, the can only search Dallas area.
+    search(street + " " + city + ", " + state + " " + zipCode);
 
-    centerMap(searchCoords.lat, searchCoords.lng);
-    addLocationMark(searchCoords.lat, searchCoords.lng);
-
-    var location = {
-        streetName: street,
-        cityName: city,
-        stateName: state,
-        zip: zipCode
-    };
-
-    database.ref().push(location);
+    
     $("#streetName-input").val("");
     $("#city-input").val("");
     $("#state-input").val("");
@@ -431,6 +538,9 @@ database.ref().on("child_added", function (childSnapshot) {
     console.log(a + b + c + d) + "work ork";
 })
 
+//#endregion
+
+//#region getCoordinates
 var lastResp = null;
 
 function getCoordinates(address) {
@@ -462,6 +572,9 @@ function getCoordinates(address) {
     return { lat: lat, lng: lng };
 }
 
+//#endregion
+
+//#region addLocation
 
 // this is to add a mark to the location that user search location including the lattitude and longtitude
 function addLocationMark(lat, lng) {
@@ -476,6 +589,9 @@ function addLocationMark(lat, lng) {
         });
     })
 }
+//#endregion
+
+//#region addMark
 
 function addMark(lat, lng, icon) {
     $(function () {
@@ -491,6 +607,10 @@ function addMark(lat, lng, icon) {
     })
 }
 
+//#endregion
+
+
+//#region centerMap
 function centerMap(lat, lng) {
     $(function () {
         $("#map").googleMap({
@@ -501,7 +621,9 @@ function centerMap(lat, lng) {
     });
 }
 
+//#endregion
 
+//#region areCoordsWithRegion
 
 //function to point within X miles of the other point
 
@@ -509,6 +631,10 @@ function areCoordsWithinRegion(srcLat, srcLng, targetCoords, range) {
     return distance(srcLat, srcLng, targetCoords.lat, targetCoords.lng, "M") <= range;
 
 }
+
+//#endregion
+
+//#region distance
 
 //  function takes two coordinates and tells you the distance in miles between them.
 // distance function is a bunch of crazy math. basically, it takes two global coordinates and does a bunch of geometer to tell you how many miles, it is crazy geometry because the distance changes based upon how high up or down on the globe you are.
@@ -529,7 +655,9 @@ function distance(lat1, lon1, lat2, lon2, unit) {
     return dist
 }
 
+//#endregion
 
+//#region getIcon
 
 function getIcon(crime) {
     var img = "";
@@ -549,9 +677,9 @@ function getIcon(crime) {
     return img;
 }
 
+//#endregion
 
-
-
+//#region initMap
 var map;
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
@@ -561,3 +689,4 @@ function initMap() {
 
     });
 }
+//#endregion
