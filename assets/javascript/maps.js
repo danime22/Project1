@@ -471,7 +471,7 @@ $("#register-input").on("click", function(event){
 
     if(password !== password2) {
         alert("Passwords don't match");
-        return false;
+        return
     }
 
 
