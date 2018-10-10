@@ -14,7 +14,7 @@ var database = firebase.database();
 
 // register a user
 //returns true if user registered, false if not.
-function registerUser(username, password, email, street, city, state, zip, range) {
+function registerUser(username, password, email) {
 
     // Make sure this username is not in use.
     var snapshot = getRecord(username);
@@ -23,14 +23,9 @@ function registerUser(username, password, email, street, city, state, zip, range
     }
 
     var userPofile = {
-        streetName: street,
-        cityName: city,
-        stateName: state,
-        zip: zip,
         username: username,
         password: password,
         email: email,
-        range: range
     };
     database.ref().push(userPofile);
 
@@ -65,32 +60,32 @@ function login(username, password) {
 //     state
 //     zip
 //     range
-function getUserSearchLocation(username) {
-    var location = {
-        street: "",
-        city: "",
-        state: "",
-        zip: "",
-        range: ""
-    }
+// function getUserSearchLocation(username) {
+//     var location = {
+//         street: "",
+//         city: "",
+//         state: "",
+//         zip: "",
+//         range: ""
+//     }
 
-    var snapshot = getRecord(username);
+//     var snapshot = getRecord(username);
 
-    if (snapshot.exists()) {
-        snapshot.forEach(function (data) {
+//     if (snapshot.exists()) {
+//         snapshot.forEach(function (data) {
 
-            location.street = snapshot.child(data.key).child("streetName").val();
-            location.city = snapshot.child(data.key).child("cityName").val();
-            location.state = snapshot.child(data.key).child("state").val();
-            location.zip = snapshot.child(data.key).child("zip").val();
-            location.range = snapshot.child(data.key).child("range").val();
+//             location.street = snapshot.child(data.key).child("streetName").val();
+//             location.city = snapshot.child(data.key).child("cityName").val();
+//             location.state = snapshot.child(data.key).child("state").val();
+//             location.zip = snapshot.child(data.key).child("zip").val();
+//             location.range = snapshot.child(data.key).child("range").val();
      
-        });
-    }
+//         });
+//     }
 
-    console.log(JSON.stringify(location));
-    return location;
-}
+//     console.log(JSON.stringify(location));
+//     return location;
+// }
 
 
 // returns the snapshot for the user
@@ -184,6 +179,8 @@ function getCurrentCalls(srcLat, srcLng) {
 
     for (i = 0; i < currentCalls.length; i++) {
         console.log(currentCalls[i]);
+        console.log("warning" + currentCalls.length);
+       
 
         var address = "";
         if (currentCalls[i].block) {
@@ -272,17 +269,19 @@ $("#shootingButton").on("click", function (e) {
     $("#crimeTabs").empty();
     for (i = 0; i < shootingArray.length; i++) {
 
-        var incidentDateTime = shootingArray[i].incident.date_time;
+
+        var incidentDateTime = shootingArray[i].incident.date;
         var incidentSuspect = shootingArray[i].incident.suspect_s;
         var incidentWeapon = shootingArray[i].incident.suspect_weapon;
-        var suspectCondition = shootingArray[i].incident.suspect_deceased_injured_or_shoot_and_miss
+        var suspectCondition = shootingArray[i].incident.suspect_deceased_injured_or_shoot_and_miss;
+        var incidentLocation = shootingArray[i].incident.location;
 
 
         var container = $("#crimeTabs");
         var createP = $("<p>");
         createP.addClass("shooting");
         createP.attr("data-id", i);
-        createP.html(incidentWeapon + "<br />" + suspectCondition + "<br />" + incidentSuspect + "<br />" + incidentDateTime);
+        createP.html(incidentLocation + "<br />" + incidentDateTime + "<br />" + incidentSuspect + "<br />" + "Suspect: " + suspectCondition + "<br />" + incidentWeapon);
 
         container.append(createP);
 
@@ -323,20 +322,23 @@ $("#callsButton").on("click", function (e) {
     for (i = 0; i < currentArray.length; i++) {
 
         var incidentDate = currentArray[i].incident.date_time;
-        var incidentPriority = currentArray[i].incident.priority;
-        var incidentNumber = currentArray[i].incident.unit_number;
-        var incidentStatus = currentArray[i].incident.status
+        var incidentLocation = currentArray[i].incident.block + " " + currentArray[i].incident.location;
+        var incidentNatureCall = currentArray[i].incident.nature_of_call;
+
+
 
 
         var container = $("#crimeTabs");
         var createP = $("<p>");
         createP.addClass("calls");
         createP.attr("data-id", i);
-        createP.html(incidentNumber + "<br />" + incidentStatus + "<br />" + incidentPriority + "<br />" + incidentDate);
+        createP.html(incidentLocation + "<br />" + incidentNatureCall + "<br />" + incidentDate);
 
         container.append(createP);
 
         addMark(currentArray[i].coords.lat, currentArray[i].coords.lng, "");
+
+        
     }
 });
 
@@ -345,10 +347,11 @@ $(document).on("click", ".calls", currentClick);
 function currentClick() {
     var item = parseInt($(this).attr("data-id"));
     var coords = currentArray[item].coords;
-    centerMap(coords.lat, coords.lng);
+    
 
     for (i = 0; i < currentArray.length; i++) {
         addMark(currentArray[i].coords.lat, currentArray[i].coords.lng, "assets/images/icons8-shooting-40.png");
+        centerMap(coords.lat, coords.lng);
 
     }
 }
@@ -401,9 +404,6 @@ function historyClick() {
     console.log("item: " + item);
     var coords = historyArray[item].coords;
     centerMap(coords.lat, coords.lng);
-    // var map = new google.maps.Map(document.getElementById("map"));
-    // var coords = historyArray[item].coords;
-    // map.setCenter(new GLatLng(coords.lat, coords.lng));
 
 
     for (i = 0; i < historyArray.length; i++) {
@@ -430,16 +430,13 @@ function search(address){
 //#region loginForm
 $("#logIn-input").on("click", function(event){
     event.preventDefault();
-    alert("work");
     var username =$("#userLog-input").val().trim();
     var password = $("#passLog-input").val().trim();
 
     var success = login(username, password);
 
     if(success){
-        var location = getUserSearchLocation(username);
-        var add = location.street +" " + location.city + ", " + location.state +" " +location.zip ;
-        search(add);
+
         $("#wholeMap").show();
         $("#formLogin").hide();
         // hide otherdiv
@@ -456,18 +453,12 @@ $("#logIn-input").on("click", function(event){
 //#region register form
 $("#register-input").on("click", function(event){
     event.preventDefault();
-    alert("work");
-    // var username =$("#username-input").val().trim();
-    // var password = $("#password-input").val().trim();
-    var street = $("#street-input").val().trim();
-    var city = $("#city-input").val().trim();
-    var state = $("#state-input").val().trim();
-    var zip = $("#zip-input").val().trim();
+
     var username = $("#username-input").val().trim();
     var password = $("#password-input").val().trim();
     var password2 = $("#password-input2").val().trim();
     var email = $("#email-input").val().trim();
-    var range = $("#range-input").val().trim();
+  
 
     if(password !== password2) {
         alert("Passwords don't match");
@@ -475,12 +466,10 @@ $("#register-input").on("click", function(event){
     }
 
 
-    var success = registerUser(username, password, email, street, city, state, zip, range);
+    var success = registerUser(username, password, email);
 
     if(success){
-        // var location = getUserSearchLocation(username);
-        var add = street + " " + city + ", " + state + " " + zip;
-        search(add);
+
         $("#wholeMap").show();
         $("#formRegister").hide();
     } else {
@@ -535,7 +524,7 @@ database.ref().on("child_added", function (childSnapshot) {
     var b = childSnapshot.val().cityName;
     var c = childSnapshot.val().stateName;
     var d = childSnapshot.val().zip;
-    console.log(a + b + c + d) + "work ork";
+    console.log(a + b + c + d + "work ork");
 })
 
 //#endregion
@@ -614,7 +603,7 @@ function addMark(lat, lng, icon) {
 function centerMap(lat, lng) {
     $(function () {
         $("#map").googleMap({
-            zoom: 10, // Initial zoom level (optional)
+            zoom: 15, // Initial zoom level (optional)
             coords: [lat, lng], // Map center (optional)
             type: "ROADMAP" // Map type (optional)
         });
